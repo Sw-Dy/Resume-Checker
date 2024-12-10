@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Interactive Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1f3a93, #3498db);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Scrollable Container */
+        .scroll-container {
+            overflow-y: scroll;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            margin: 60px auto;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            animation: slideIn 1.5s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #fff;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin: 20px 0;
+            color: #f0f0f0;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+            animation: fadeIn 2s ease-out;
+        }
+
+        ul li {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        ul li::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: left 0.3s ease;
+        }
+
+        ul li:hover::before {
+            left: 0;
+        }
+
+        ul li:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        a {
+            text-decoration: none;
+            color: #00e6e6;
+            font-weight: 600;
+            animation: fadeInUp 1.5s ease-out;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #00ffcc;
+        }
+
+        .chart-container {
+            margin: 40px auto;
+            width: 70%;
+            position: relative;
+            animation: fadeInUp 2s ease-out;
+        }
+
+        button {
+            background-color: #ff6f61;
+            color: #fff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            animation: bounceIn 1.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+            border-radius: 50%;
+        }
+
+        button:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        button:hover {
+            background-color: #ff3d34;
+        }
+
+        /* Notification Popup */
+        .notification {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #2ecc71;
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+            display: none;
+            animation: fadeIn 1s forwards;
+        }
+
+        /* Footer Styling */
+        footer {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 10px 0;
+            text-align: center;
+            color: #fff;
+            margin-top: 30px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        /* Background Animation */
+        .bg-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .bg-animation .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: moveShapes 20s linear infinite;
+        }
+
+        /* Shape Sizes and Positions */
+        .shape-1 {
+            width: 100px;
+            height: 100px;
+            top: -10%;
+            left: 30%;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 120px;
+            height: 120px;
+            top: 40%;
+            left: -10%;
+            animation-delay: 2s;
+        }
+
+        .shape-3 {
+            width: 200px;
+            height: 200px;
+            bottom: -20%;
+            right: -20%;
+            animation-delay: 4s;
+        }
+
+        .shape-4 {
+            width: 150px;
+            height: 150px;
+            bottom: 30%;
+            right: 10%;
+            animation-delay: 6s;
+        }
+
+        @keyframes moveShapes {
+            0% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(20px) translateX(30px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes bounceIn {
+            from { transform: scale(0.95); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="bg-animation">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+
+    <!-- Notification Popup -->
+    <div class="notification" id="notification">New insights are available!</div>
+
+    <!-- Scrollable Main Content -->
+    <div class="scroll-container">
+        <div class="container">
+            <h1>Resume Evaluation Results</h1>
+            <p><strong>Score:</strong> {{ score }}</p>
+            <p><strong>Missing Keywords:</strong></p>
+            <ul>
+                {% for keyword in missing_keywords %}
+                    <li>{{ keyword }}</li>
+                {% endfor %}
+            </ul>
+            <p><strong>Recommended Resources:</strong></p>
+            <ul>
+                {% for resource in resources %}
+                    <li><a href="{{ resource }}" target="_blank">{{ resource }}</a></li>
+                {% endfor %}
+            </ul>
+            
+            <!-- Pie Chart -->
+            <div class="chart-container">
+                <canvas id="evaluationChart"></canvas>
+            </div>
+
+            <!-- Probability Curve -->
+            <div class="chart-container">
+                <canvas id="probabilityCurve"></canvas>
+            </div>
+            
+            <button id="refreshButton">Refresh Data</button>
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Professional Dashboard. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Replace with your actual keyword data
+        const presentKeywords = ['AI', 'Data Science', 'Accounting', 'Software Engineering'];
+        const missingKeywords = ['Blockchain', 'Quantum Computing'];
+        const totalKeywords = presentKeywords.length + missingKeywords.length;
+
+        // Update pie chart data
+        function updatePieChart() {
+            const ctx = document.getElementById('evaluationChart').getContext('2d');
+            const pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Keywords Present', 'Keywords Missing'],
+                    datasets: [{
+                        data: [presentKeywords.length, missingKeywords.length],
+                        backgroundColor: ['#3498db', '#e74c3c'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    animation: {
+                        animateScale: true,
+                        duration: 2000
+                    },
+                    plugins: {
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update probability curve data
+        function updateProbabilityCurve() {
+            const ctx = document.getElementById('probabilityCurve').getContext('2d');
+            const probabilityCurve = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: totalKeywords }, (_, i) => i + 1),
+                    datasets: [{
+                        label: 'Probability of Keywords Present',
+                        data: Array.from({ length: totalKeywords }, (_, i) => (i + 1) / totalKeywords),
+                        borderColor: '#00e6e6',
+                        backgroundColor: 'rgba(0, 230, 230, 0.2)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    animation: {
+                        duration: 2000
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Total Keywords Evaluated'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Probability'
+                            },
+                            min: 0,
+                            max: 1
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return `Probability: ${(tooltipItem.raw * 100).toFixed(2)}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initial chart renders
+        updatePieChart();
+        updateProbabilityCurve();
+
+        // Notification Popup Display
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.style.display = 'block';
+            setTimeout(() => { notification.style.display = 'none'; }, 4000);
+        }
+        setTimeout(showNotification, 2000); // Show after 2 seconds
+
+        // Button Interactivity
+        document.getElementById('refreshButton').addEventListener('click', function() {
+            // Simulate refreshing data
+            presentKeywords.push('New Skill');
+            missingKeywords.push('New Missing Skill');
+            updatePieChart();
+            updateProbabilityCurve();
+            showNotification();
+        });
+    </script>
+</body>
+</html>
